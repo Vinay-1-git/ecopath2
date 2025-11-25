@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenPath: Sustainable Mobility Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places,geometry,visualization&callback=initApp" async defer></script>
+</head>
+<body>
+
+    <section id="welcome-section" class="active-section">
+        <div class="green-background-overlay">
+            <div class="auth-card">
+                <div class="brand-header">
+                    <h1>GreenPath 🌿</h1>
+                    <p>Navigate the urban jungle, sustainably.</p>
+                </div>
+                
+                <div class="auth-tabs">
+                    <button id="tab-login" class="active">Log In</button>
+                    <button id="tab-signup">Sign Up</button>
+                </div>
+
+                <form id="login-form">
+                    <div class="input-group">
+                        <input type="email" id="login-email" placeholder="Email Address" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="login-password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="action-btn">Access Dashboard</button>
+                </form>
+
+                <form id="signup-form" class="hidden">
+                    <div class="input-group">
+                        <input type="text" id="signup-name" placeholder="Full Name" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="email" id="signup-email" placeholder="Email Address" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="signup-password" placeholder="Create Password" required>
+                    </div>
+                    <button type="submit" class="action-btn">Create Account</button>
+                </form>
+
+                <div id="auth-feedback" class="feedback-msg"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="dashboard-section" class="hidden">
+        <nav class="top-nav">
+            <div class="nav-brand">GreenPath Dashboard</div>
+            <div class="nav-user">
+                <span>Welcome, <strong id="user-name-display">User</strong></span>
+                <button id="logout-btn">Log Out</button>
+            </div>
+        </nav>
+
+        <div class="main-layout">
+            <aside class="control-panel">
+                <div class="panel-section">
+                    <h3>Route Planning</h3>
+                    <div class="route-inputs">
+                        <label>Origin</label>
+                        <input type="text" id="origin-input" placeholder="Enter start location...">
+                        
+                        <label>Destination</label>
+                        <input type="text" id="destination-input" placeholder="Enter destination...">
+                    </div>
+
+                    <div class="mode-selector">
+                        <label>Transport Mode</label>
+                        <select id="transport-mode">
+                            <option value="DRIVING">Car (Gasoline)</option>
+                            <option value="TRANSIT">Public Bus</option>
+                            <option value="BICYCLING">Bicycle</option>
+                            <option value="WALKING">Walking</option>
+                        </select>
+                    </div>
+
+                    <button id="find-route-btn" class="primary-action-btn">Find Green Path</button>
+                </div>
+
+                <div class="panel-section stats-container">
+                    <h3>Eco-Metrics</h3>
+                    
+                    <div class="metric-card">
+                        <span class="metric-label">Total Distance</span>
+                        <span id="metric-distance" class="metric-value">0.0 km</span>
+                    </div>
+
+                    <div class="metric-card">
+                        <span class="metric-label">CO2 Footprint</span>
+                        <span id="metric-co2" class="metric-value bad">0.0 kg</span>
+                        <small id="co2-comparison">vs Bus: -0%</small>
+                    </div>
+
+                    <div class="metric-card">
+                        <span class="metric-label">Air Quality (AQI)</span>
+                        <span id="metric-aqi" class="metric-value">--</span>
+                        <small>Based on route data</small>
+                    </div>
+                </div>
+
+                <div class="panel-section carpool-promo">
+                    <h4>Collaborative Transit</h4>
+                    <p>Reduce emissions by 50% by sharing your ride.</p>
+                    <button id="open-carpool-hub" class="secondary-action-btn">Open Carpool Hub</button>
+                </div>
+            </aside>
+
+            <div class="map-wrapper">
+                <div id="map-canvas"></div>
+                <div class="map-legend">
+                    <div class="legend-item"><span class="dot green"></span> Green Path (High Vegetation)</div>
+                    <div class="legend-item"><span class="dot grey"></span> Standard Route</div>
+                    <div class="legend-item"><span class="dot red"></span> High Traffic/Pollution</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="carpool-modal" class="modal-overlay hidden">
+        <div class="modal-window">
+            <header class="modal-header">
+                <h2>Carpool Connection Hub</h2>
+                <button class="close-modal">&times;</button>
+            </header>
+            
+            <div class="modal-body">
+                <div class="carpool-controls">
+                    <div class="form-row">
+                        <select id="cp-role">
+                            <option value="DRIVER">I am Driving (Offer Ride)</option>
+                            <option value="RIDER">I need a Ride (Request)</option>
+                        </select>
+                        <input type="number" id="cp-seats" min="1" max="6" value="1" placeholder="Seats">
+                    </div>
+                    <div class="form-row">
+                        <input type="text" id="cp-location-search" placeholder="Confirm your location...">
+                        <button id="cp-publish-btn">Publish Request</button>
+                    </div>
+                </div>
+
+                <div class="reminder-section">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="notification-toggle">
+                        Enable Browser Notifications (15m Reminder)
+                    </label>
+                </div>
+
+                <div class="matches-section">
+                    <h3>Nearby Matches</h3>
+                    <ul id="matches-list">
+                        <li class="empty-msg">No active requests nearby. Publish yours to be seen!</li>
+                    </ul>
+                    <button id="refresh-matches-btn">Refresh List</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
